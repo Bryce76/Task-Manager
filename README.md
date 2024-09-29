@@ -123,6 +123,3 @@ json
     "updatedAt": "2024-09-28T13:00:00.000Z"
   }
 ]
-
-
-This `README` should provide a comprehensive overview of your Task Manager CLI and how to use it. Let me know if you'd like any changes!
