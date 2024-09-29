@@ -1,5 +1,7 @@
 # Task Manager CLI
 
+Project URL: https://roadmap.sh/projects/task-tracker
+
 A simple command-line interface (CLI) application for managing tasks. You can create, update, delete, and list tasks using various commands. Tasks are stored in a `tasks.json` file with properties such as `id`, `description`, `status`, `createdAt`, and `updatedAt`.
 
 ## Features
