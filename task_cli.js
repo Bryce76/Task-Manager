@@ -34,74 +34,97 @@ function addTask(description) {
 
 // Function to update a task by id
 function updateTask(id, updatedDescription) {
-    const taskIndex = tasks.findIndex(task => task.id === id); // Find task by id
-  
-    if (taskIndex !== -1) {
-      // Update task details
-      tasks[taskIndex].description = updatedDescription || tasks[taskIndex].description; // Update description if provided
-      tasks[taskIndex].updatedAt = new Date().toISOString(); // Update the updatedAt timestamp
-  
-      // Write the updated tasks array back to the file
-      fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), 'utf-8');
-      console.log(`Task with ID ${id} has been updated.`);
-    } else {
-      console.log(`Task with ID ${id} not found.`);
-    }
-  }
-  
-  // Function to delete a task by id
-function deleteTask(id) {
-    const taskIndex = tasks.findIndex(task => task.id === id); // Find task by id
-  
-    if (taskIndex !== -1) {
-      tasks.splice(taskIndex, 1); // Remove the task from the array
-      fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), 'utf-8');
-      console.log(`Task with ID ${id} has been deleted.`);
-    } else {
-      console.log(`Task with ID ${id} not found.`);
-    }
-  }
+  const taskIndex = tasks.findIndex(task => task.id === id); // Find task by id
 
-  // Function to update the status of a task
-function updateTaskStatus(id, newStatus) {
-    const taskIndex = tasks.findIndex(task => task.id === id); // Find task by id
-  
-    if (taskIndex !== -1) {
-      // Update task status
-      tasks[taskIndex].status = newStatus;
-      tasks[taskIndex].updatedAt = new Date().toISOString(); // Update the updatedAt timestamp
-  
-      // Write the updated tasks array back to the file
-      fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), 'utf-8');
-      console.log(`Task with ID ${id} marked as ${newStatus}.`);
-    } else {
-      console.log(`Task with ID ${id} not found.`);
-    }
-  }
+  if (taskIndex !== -1) {
+    // Update task details
+    tasks[taskIndex].description = updatedDescription || tasks[taskIndex].description; // Update description if provided
+    tasks[taskIndex].updatedAt = new Date().toISOString(); // Update the updatedAt timestamp
 
-  // Accept command-line arguments for adding or updating tasks
-  const args = process.argv.slice(2);
-  
-  if (args[0] === 'add' && args[1]) {
-    const description = args.slice(1).join(' '); // Capture the description from the command line
-    addTask(description);
-  } else if (args[0] === 'update' && args[1] && args[2]) {
-    const id = parseInt(args[1], 10); // Task ID to update
-    const newDescription = args[2];   // New task description
-    updateTask(id, newDescription);
-  } else if (args[0] === 'mark-in-progress' && args[1]) {
-    const id = parseInt(args[1], 10); // Task ID to update
-    updateTaskStatus(id, "in-progress"); // Mark as "in-progress"
-  } else if (args[0] === 'mark-done' && args[1]) {
-    const id = parseInt(args[1], 10); // Task ID to update
-    updateTaskStatus(id, "done"); // Mark as "done"
-  } else if (args[0] === 'delete' && args[1]) {
-        const id = parseInt(args[1], 10); // Task ID to delete
-        deleteTask(id);
+    // Write the updated tasks array back to the file
+    fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), 'utf-8');
+    console.log(`Task with ID ${id} has been updated.`);
   } else {
-    console.log('To add a task, use: node task_cli.js add "task description"');
-    console.log('To update a task, use: node task_cli.js update <id> "new description"');
-    console.log('To mark a task as done, use: node task_cli.js mark-done <id>');
-    console.log('To delete a task, use: node task_cli.js delete <id>');
+    console.log(`Task with ID ${id} not found.`);
   }
-  
+}
+
+// Function to delete a task by id
+function deleteTask(id) {
+  const taskIndex = tasks.findIndex(task => task.id === id); // Find task by id
+
+  if (taskIndex !== -1) {
+    tasks.splice(taskIndex, 1); // Remove the task from the array
+    fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), 'utf-8');
+    console.log(`Task with ID ${id} has been deleted.`);
+  } else {
+    console.log(`Task with ID ${id} not found.`);
+  }
+}
+
+// Function to update the status of a task
+function updateTaskStatus(id, newStatus) {
+  const taskIndex = tasks.findIndex(task => task.id === id); // Find task by id
+
+  if (taskIndex !== -1) {
+    // Update task status
+    tasks[taskIndex].status = newStatus;
+    tasks[taskIndex].updatedAt = new Date().toISOString(); // Update the updatedAt timestamp
+
+    // Write the updated tasks array back to the file
+    fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), 'utf-8');
+    console.log(`Task with ID ${id} marked as ${newStatus}.`);
+  } else {
+    console.log(`Task with ID ${id} not found.`);
+  }
+}
+
+// Function to list tasks, optionally filtering by status
+function listTasks(status = null) {
+  let filteredTasks = tasks;
+
+  // If status is provided, filter tasks based on the status
+  if (status) {
+    filteredTasks = tasks.filter(task => task.status === status);
+  }
+
+  // Print the tasks
+  if (filteredTasks.length === 0) {
+    console.log(`No tasks found${status ? ` with status "${status}"` : ""}.`);
+  } else {
+    console.log(`Listing tasks${status ? ` with status "${status}"` : ""}:`);
+    filteredTasks.forEach(task => {
+      console.log(`ID: ${task.id}, Description: ${task.description}, Status: ${task.status}, Created At: ${task.createdAt}, Updated At: ${task.updatedAt}`);
+    });
+  }
+}
+
+// Accept command-line arguments for functions
+const args = process.argv.slice(2);
+
+if (args[0] === 'add' && args[1]) {
+  const description = args.slice(1).join(' '); // Capture the description from the command line
+  addTask(description);
+} else if (args[0] === 'update' && args[1] && args[2]) {
+  const id = parseInt(args[1], 10); // Task ID to update
+  const newDescription = args[2];   // New task description
+  updateTask(id, newDescription);
+} else if (args[0] === 'mark-in-progress' && args[1]) {
+  const id = parseInt(args[1], 10); // Task ID to update
+  updateTaskStatus(id, "in-progress"); // Mark as "in-progress"
+} else if (args[0] === 'mark-done' && args[1]) {
+  const id = parseInt(args[1], 10); // Task ID to update
+  updateTaskStatus(id, "done"); // Mark as "done"
+} else if (args[0] === 'delete' && args[1]) {
+  const id = parseInt(args[1], 10); // Task ID to delete
+  deleteTask(id);
+} else if (args[0] === 'list') {
+    const status = args[1]; // Optional status filter
+    listTasks(status);
+} else {
+  console.log('To add a task, use: node task_cli.js add "task description"');
+  console.log('To update a task, use: node task_cli.js update <id> "new description"');
+  console.log('To mark a task as done, use: node task_cli.js mark-done <id>');
+  console.log('To delete a task, use: node task_cli.js delete <id>');
+}
+
